@@ -1,0 +1,42 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: @DEPLOYMENT_NAME@
+  namespace: @TARGET_NAMESPACE@
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: @DEPLOYMENT_NAME@
+  template:
+    metadata:
+      labels:
+        deployment: @DEPLOYMENT_NAME@
+    spec:
+      containers:
+      - name: @DEPLOYMENT_NAME@
+        image: @IMAGE_NAME@
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APP_ENVIRONMENT
+          value: @TARGET_NAMESPACE@
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: @DEPLOYMENT_NAME@
+  namespace: @TARGET_NAMESPACE@
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    deployment: @DEPLOYMENT_NAME@
