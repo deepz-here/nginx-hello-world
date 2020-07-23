@@ -1,3 +1,6 @@
-FROM nginx:latest
+FROM webdevops/php-nginx:latest
 
-COPY index.html.tmpl /usr/share/nginx/html/index.html
+ARG IMAGE_VERSION
+COPY index.php /app/index.php
+RUN sed -i "s/@VERSION@/${IMAGE_VERSION}/g" /app/index.php
+RUN cat /app/index.php

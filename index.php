@@ -1,0 +1,1 @@
+ <?php echo '<p>nginx-hello-world:@VERSION@  is running within  environment: ' . getenv("APP_ENVIRONMENT") . '</p>'; ?> 
