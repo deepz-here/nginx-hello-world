@@ -1,1 +1,2 @@
-# nothing yet
+bases:
+  - stage.yaml
