@@ -33,6 +33,7 @@ metadata:
   name: @DEPLOYMENT_NAME@
   namespace: @TARGET_NAMESPACE@
 spec:
+  type: NodePort
   ports:
   - name: http
     port: 80
