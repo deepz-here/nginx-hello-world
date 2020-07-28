@@ -10,6 +10,60 @@ bases:
   - dev.yaml
   - prod.yaml
 
+
+jinja2-macros: 
+  #
+  # This will be parsed by jinja2
+  # see
+  # https://github.com/bitsofinfo/cicdstatemgr/blob/master/examples/tekton/pipelines/deploy/tasks/deploy.yaml
+  # 
+  # In reality you would not create k8s manifests this way, but is mearly to serve
+  # as an example of the types of things you can build w/ cicdstatemgr
+  #
+  deploymentYamlTemplate: |
+    {%- macro deploymentYamlTemplate() -%}
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: {{tmplctx.deploymentName}}
+      namespace: {{tmplctx.targetNamespace}}
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          deployment: {{tmplctx.deploymentName}}
+      template:
+        metadata:
+          labels:
+            deployment: {{tmplctx.deploymentName}}
+        spec:
+          containers:
+          - name: {{tmplctx.deploymentName}}
+            image: {{tmplctx.imageName}}
+            ports:
+            - containerPort: 80
+            env:
+            - name: APP_ENVIRONMENT
+              value: {{tmplctx.targetNamespace}}
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: {{tmplctx.deploymentName}}
+      namespace: {{tmplctx.targetNamespace}}
+    spec:
+      type: NodePort
+      ports:
+      - name: http
+        port: 80
+        protocol: TCP
+        targetPort: 80
+      selector:
+        deployment: {{tmplctx.deploymentName}}
+    {%- endmacro -%}
+
+
 # 
 # Our app's customizations
 #
@@ -18,54 +72,12 @@ cicd-contexts:
     pipelines:
       deploy:
         deployTask: 
-
-          #
-          # This will be parsed by jinja2
-          # see
-          # https://github.com/bitsofinfo/cicdstatemgr/blob/master/examples/tekton/pipelines/deploy/tasks/deploy.yaml
-          # 
-          # In reality you would not create k8s manifests this way, but is mearly to serve
-          # as an example of the types of things you can build w/ cicdstatemgr
-          #
           deploymentYamlTemplate: |
-            ---
-            apiVersion: apps/v1
-            kind: Deployment
-            metadata:
-              name: {{tmplctx.deploymentName}}
-              namespace: {{tmplctx.targetNamespace}}
-            spec:
-              replicas: 1
-              selector:
-                matchLabels:
-                  deployment: {{tmplctx.deploymentName}}
-              template:
-                metadata:
-                  labels:
-                    deployment: {{tmplctx.deploymentName}}
-                spec:
-                  containers:
-                  - name: {{tmplctx.deploymentName}}
-                    image: {{tmplctx.imageName}}
-                    ports:
-                    - containerPort: 80
-                    env:
-                    - name: APP_ENVIRONMENT
-                      value: {{tmplctx.targetNamespace}}
-            ---
-            apiVersion: v1
-            kind: Service
-            metadata:
-              name: {{tmplctx.deploymentName}}
-              namespace: {{tmplctx.targetNamespace}}
-            spec:
-              type: NodePort
-              ports:
-              - name: http
-                port: 80
-                protocol: TCP
-                targetPort: 80
-              selector:
-                deployment: {{tmplctx.deploymentName}}
-            
+            {{ deploymentYamlTemplate() }}
 
+  prod:
+    pipelines:
+      deploy:
+        deployTask: 
+          deploymentYamlTemplate: |
+            {{ deploymentYamlTemplate() }}
