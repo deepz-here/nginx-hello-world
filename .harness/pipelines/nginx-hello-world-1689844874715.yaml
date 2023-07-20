@@ -1,0 +1,37 @@
+pipeline:
+  identifier: Build_nginx_hello_world_1689844879921
+  name: Build nginx-hello-world
+  orgIdentifier: default
+  projectIdentifier: default_project
+  properties:
+    ci:
+      codebase:
+        build: <+input>
+        connectorRef: account.Github_OAuth_1689838783895
+        repoName: deepz-here/nginx-hello-world
+  stages:
+    - stage:
+        identifier: build
+        name: build
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  identifier: dockerbuild
+                  name: docker_build
+                  spec:
+                    image: plugins/docker
+                    settings:
+                      dry_run: "true"
+                      repo: hello/world
+                      tags: latest
+                  timeout: ""
+                  type: Plugin
+          platform:
+            arch: Amd64
+            os: Linux
+          runtime:
+            spec: {}
+            type: Cloud
+        type: CI
