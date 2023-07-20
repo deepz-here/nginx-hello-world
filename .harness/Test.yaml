@@ -31,3 +31,5 @@ pipeline:
                   name: Run_1
                   identifier: Run_1
                   spec: {}
+  delegateSelectors:
+    - docker-delegate
