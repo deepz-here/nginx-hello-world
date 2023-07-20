@@ -26,10 +26,7 @@ pipeline:
             spec: {}
           execution:
             steps:
-              - step:
-                  type: Run
-                  name: Run_1
-                  identifier: Run_1
-                  spec: {}
+              - name: Echo Hello World
+                run: echo "Hello World"
   delegateSelectors:
     - docker-delegate
